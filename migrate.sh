@@ -299,7 +299,9 @@ if [[ $dst_bytes -gt $src_bytes ]]; then
         if [[ "$DRY_RUN" -eq 1 ]]; then
             log_info "$(_t "msg_dryrun_expand" "$DEST_DISK")"
         else
-            expand_root_partition "$DEST_DISK"
+            if ! expand_root_partition "$DEST_DISK"; then
+                log_warn "$(_t "msg_expansion_skipped")"
+            fi
         fi
     else
         log_info "$(_t "msg_expansion_skipped")"

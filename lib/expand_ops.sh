@@ -42,7 +42,8 @@ expand_root_partition() {
     current_end=$(sgdisk -i "$part_num" "$dest" | grep "Last sector" | awk '{print $3}')
 
     if [[ -z "$start_sector" || -z "$last_sector" || -z "$current_end" ]]; then
-        log_fatal "$(_t "msg_reading_geometry")"
+        log_error "$(_t "msg_reading_geometry")"
+        return 1
     fi
 
     log_info "$(_t "msg_geometry_start" "$start_sector" "$current_end" "$last_sector")"
@@ -61,8 +62,10 @@ expand_root_partition() {
     fi
 
     log_info "$(_t "msg_resizing_with_sgdisk")"
-    sgdisk -d "$part_num" -n "${part_num}:${start_sector}:${last_sector}" -c "${part_num}:APP" "$dest" || \
-        log_fatal "$(_t "msg_sgdisk_resize_failed")"
+    sgdisk -d "$part_num" -n "${part_num}:${start_sector}:${last_sector}" -c "${part_num}:APP" "$dest" || {
+        log_error "$(_t "msg_sgdisk_resize_failed")"
+        return 1
+    }
 
     partprobe "$dest"
     blockdev --rereadpt "$dest"
@@ -73,7 +76,10 @@ expand_root_partition() {
     e2fsck -f "$root_part" || log_warn "$(_t "msg_e2fsck_issues")"
 
     log_info "$(_t "msg_growing_fs")"
-    resize2fs "$root_part" || log_fatal "$(_t "msg_resize2fs_failed")"
+    resize2fs "$root_part" || {
+        log_error "$(_t "msg_resize2fs_failed")"
+        return 1
+    }
 
     log_success "$(_t "msg_root_expanded")"
     lsblk -o NAME,SIZE "$root_part"
