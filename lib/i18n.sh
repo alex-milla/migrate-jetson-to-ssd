@@ -15,6 +15,7 @@ load_i18n() {
     I18N=()
 
     # ─── English ───
+    declare -A I18N_EN
     I18N_EN=(
         ["title_assistant"]="Jetson Storage Migration Assistant v2.0"
         ["title_assistant_subtitle"]="Migrate safely between SD / USB / M.2 (NVMe)"
@@ -184,6 +185,7 @@ load_i18n() {
     )
 
     # ─── Español ───
+    declare -A I18N_ES
     I18N_ES=(
         ["title_assistant"]="Asistente de Migración de Almacenamiento Jetson v2.0"
         ["title_assistant_subtitle"]="Migra de forma segura entre SD / USB / M.2 (NVMe)"
